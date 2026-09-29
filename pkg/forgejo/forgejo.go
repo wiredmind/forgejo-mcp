@@ -47,9 +47,8 @@ func Client(ctx context.Context) (*forgejo.Client, error) {
 		if err != nil {
 			log.ErrorCtx(ctx, "Failed to create ephemeral Forgejo client",
 				log.SanitizedURLField("url", flag.URL),
-				log.ErrorField(err),
 			)
-			return nil, fmt.Errorf("create ephemeral client: %w", err)
+			return nil, fmt.Errorf("create ephemeral Forgejo client failed")
 		}
 		return c, nil
 	}
@@ -69,11 +68,10 @@ func Client(ctx context.Context) (*forgejo.Client, error) {
 			if err != nil {
 				log.Error("Failed to create Forgejo client",
 					log.SanitizedURLField("url", flag.URL),
-					log.ErrorField(err),
 				)
-				// We still fatal here because if the singleton can't be created at startup,
-				// the server is useless in stdio mode.
-				log.Fatalf("create forgejo client err: %v", err)
+				// Do not include the SDK error: authentication failures can embed
+				// the bearer token in provider error text.
+				log.Fatalf("create Forgejo client failed")
 			}
 			client = c
 			log.Info("Successfully created Forgejo client",
